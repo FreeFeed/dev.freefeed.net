@@ -25,9 +25,12 @@ titleOrNothing x =
         Nothing -> ""
         Just s -> s
 
+port currentMilestone : Task Http.Error ()
+port currentMilestone =
+    Http.getString "//developer.freefeed.net/current_milestone"
+
 port fetchMilestones : Task Http.Error ()
 port fetchMilestones =
     Github.milestones "pepyatka" "pepyatka-html"
     `andThen` \mstones -> Signal.send mss.address <| join ", " <| List.map (\item -> titleOrNothing item.title) mstones
-
---`onError` \error -> Signal.send errors.address error
+    `onError` \error -> Signal.send errors.address error
